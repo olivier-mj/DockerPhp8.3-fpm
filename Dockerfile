@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    wget \
     zip \
     vim \
     # Installation de FFmpeg - AJOUTEZ CES LIGNES
