@@ -25,7 +25,7 @@ RUN docker-php-ext-install mysqli pdo_mysql
 RUN apt-get update && apt-get install -y libmagickwand-dev --no-install-recommends && pecl install imagick && docker-php-ext-enable imagick 
 
 # GD
-RUN apt-get update && apt-get install -y zlib1g-dev libwebp-dev libpng-dev && docker-php-ext-install gd
+RUN apt-get update && apt-get install -y zlib1g-dev libwebp-dev libpng-dev ffmpeg libjpeg-dev libfreetype6-dev && docker-php-ext-install gd
 
 RUN apt-get clean; \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
