@@ -1,36 +1,38 @@
+# Basé sur votre image existante
 FROM php:8.3-fpm
-LABEL maintainer="contact@oliviermariejoseph.fr"
 
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y \
-	wget \
-	git \
-	nano 
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    libwebp-dev \
+    libzip-dev \
+    unzip \
+    git \
+    curl \
+    zip \
+    vim \
+    # Installation de FFmpeg - AJOUTEZ CES LIGNES
+    ffmpeg \
+    # Fin des ajouts pour FFmpeg
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install zip pdo pdo_mysql exif intl
 
+# Installez vos autres extensions PHP et configurations selon vos besoins
 
-RUN apt-get update && apt-get install -y libzip-dev libicu-dev && docker-php-ext-install pdo zip intl opcache 
+# Vérifiez que FFmpeg est bien installé
+RUN ffmpeg -version
 
-# Support de apcu
-RUN pecl install apcu && docker-php-ext-enable apcu
+# Configuration de PHP
+COPY php.ini /usr/local/etc/php/conf.d/custom.ini
 
-# Support de redis
-RUN pecl install redis && docker-php-ext-enable redis
+# Répertoire de travail
+WORKDIR /var/www
 
-# Support de Postgre
-RUN apt-get update && apt-get install -y libpq-dev && docker-php-ext-install pdo_pgsql
-
-# Support de MySQL 
-RUN docker-php-ext-install mysqli pdo_mysql
-
-# Imagick
-RUN apt-get update && apt-get install -y libmagickwand-dev --no-install-recommends && pecl install imagick && docker-php-ext-enable imagick 
-
-# GD
-RUN apt-get update && apt-get install -y zlib1g-dev libwebp-dev libpng-dev ffmpeg libjpeg-dev libfreetype6-dev && docker-php-ext-install gd
-
-RUN apt-get clean; \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
-
-ADD php.ini /usr/local/etc/php/conf.d/
+# Utilisateur
+RUN usermod -u 1000 www-data
 
 # Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
@@ -47,6 +49,7 @@ RUN curl -L https://github.com/fabpot/local-php-security-checker/releases/downlo
 RUN pecl install xdebug-3.3.2 && docker-php-ext-enable xdebug
 ADD php.ini /usr/local/etc/php/conf.d/
 
-WORKDIR /var/www
-
+# Exposer le port
 EXPOSE 9000
+
+CMD ["php-fpm"]
