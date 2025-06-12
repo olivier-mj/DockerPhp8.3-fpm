@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libwebp-dev \
     libzip-dev \
+    libicu-dev \
     unzip \
     git \
     curl \
